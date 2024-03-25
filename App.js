@@ -1,23 +1,51 @@
 import { StatusBar } from 'expo-status-bar';
-import { KeyboardAvoidingView, StyleSheet, Text, View, Platform, TextInput, TouchableOpacity } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, Text, View, Platform, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import Task from './components/Task';
+import { useState } from 'react';
 
 export default function App() {
+
+  const [task, setTask] = useState();
+  const [taskItems, setTaskItems] = useState([]);
+
+  const handleTask = () => {
+    console.log(task);
+    Keyboard.dismiss();
+    setTaskItems([...taskItems, task])
+    if (taskItems.length > 0) {
+      console.log(taskItems);
+    }
+    setTask();
+  }
+
+  const deleteTask = (index) => {
+    let itemsCopy = [...taskItems];
+    itemsCopy.splice(index, 1);
+    setTaskItems(itemsCopy);
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.taskWrapper}>
-        <Text style={styles.sectionTitle}>Tareas de hoy</Text>
+        <Text style={styles.sectionTitle}>Tareas de hoy!</Text>
         <View style={styles.itemsWrapper}>
           {/* Items here */}
+          {
+            taskItems.map((item, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => { deleteTask(index) }}>
+                  <Task taskText={item}  />
+                </TouchableOpacity>
+              )
 
-          <Task taskText='Tarea 1' />
-          <Task taskText='Tarea 2' />
+            })
+          }
         </View>
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.writeTaskWrapper}>
-        <TextInput style={styles.input} placeholder='Escribe una tarea' />
-        <TouchableOpacity>
+        <TextInput style={styles.input} placeholder='Escribe una tarea' value={task} onChangeText={text => { setTask(text) }} />
+        <TouchableOpacity onPress={() => { handleTask() }}>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}>
               +
